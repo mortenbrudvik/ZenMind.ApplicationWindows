@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Diagnostics;
+using Ardalis.GuardClauses;
 using PInvoke;
-using static ZenMind.ApplicationWindows.WindowApi.DwmApi;
+using static ZenMind.ApplicationWindows.SystemApi.DwmApi;
 
-namespace ZenMind.ApplicationWindows
+namespace ZenMind.ApplicationWindows.SystemApi
 {
     /// <summary>
     /// Wrapper for ApplicationWindows API calls (User32, DWMApi etc.)
     /// </summary>
-    public class WindowWrapper
+    internal sealed class WindowApi
     {
-        public WindowWrapper(IntPtr handle)
-        {
-            if (handle == IntPtr.Zero)
-                throw new ArgumentException("Window handle must be other than IntPtr.Zero", nameof(handle));
-            Handle = handle;
-        }
+        public WindowApi(IntPtr handle) => Handle = Guard.Against.Default(handle, nameof(handle));
 
         public IntPtr Handle { get; }
         public string Title => User32.GetWindowText(Handle);
@@ -46,7 +42,7 @@ namespace ZenMind.ApplicationWindows
         public override bool Equals(object obj) =>
             obj is Window window && Equals(window);
 
-        public bool Equals(WindowWrapper other) =>
+        public bool Equals(WindowApi other) =>
             Handle.ToInt32().Equals(other?.Handle.ToInt32());
 
         public override int GetHashCode()
